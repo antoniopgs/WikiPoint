@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-
+from pptx import Presentation
 
 def read(x):
     info = x.find_all("p")
@@ -16,9 +16,20 @@ def write(x):
     with open("data.txt", "w") as file:
         file.write(data)
 
+def make_ppt():
+    ppt = Presentation()
+    title_slide_layout = ppt.slide_layouts[0]
+    title_slide = ppt.slides.add_slide(title_slide_layout)
+    title = title_slide.shapes.title
+    subtitle = title_slide.placeholders[1]
+    title.text = search_term
+    subtitle.text = author
+    ppt.save('presentation.pptx')
 
-# Receive Input:
+
+# Receive Inputs:
 search_term = input("Search: ").title()
+author = input("Author Name (You): ")
 # Build URL:
 url = "https://www.britannica.com/place/" + search_term
 # Get Request:
@@ -43,9 +54,11 @@ if request.status_code == 200:
         html = request.text
         soup = BeautifulSoup(html, 'html.parser')
         write(soup)
+        make_ppt()
     else:
     # If there are no Sub Sections, just print the text regularly:      
         write(soup)
+        make_ppt()
 
 # If Page Is Not Found:
 elif request.status_code == 404:
