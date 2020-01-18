@@ -22,9 +22,10 @@ if request.status_code == 200:
 
     # Remove All Tables
     soup.table.decompose()
+    soup
 
     # Get Headers and Paragraphs
-    paragraphs = soup.findAll(["h1", "h2", "h3", "h4", "h5", "h6", "p"])
+    paragraphs = soup.findAll(["h1", "h2", "h3", "h4", "h5", "h6", "p", ""])
 
     """# Get JSON/Dict
     data = {}
@@ -35,7 +36,11 @@ if request.status_code == 200:
     clean_paragraphs = [paragraph.get_text() for paragraph in paragraphs]
 
     # Join Pieces of Text Together
-    text = "\n".join(clean_paragraphs)
+    raw_text = "\n".join(clean_paragraphs)
+
+    # Remove Everything from "See Also" onwards:
+    separate_texts = raw_text.split("See also")
+    text = separate_texts[0]
     
     # Using Regex to Remove "[x]"
     regex = re.compile("\[.*\]")
