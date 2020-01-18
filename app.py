@@ -31,9 +31,11 @@ def select_topic(search_term):
 search_result = search()
 topic_result = select_topic(search_result)
 page = wikipedia.page(search_result[topic_result-1])
+pre_info = page.content.split("== See also ==")
+info = pre_info[0].strip()
 
 with open("text.txt", "w", encoding="utf-8") as file:
-    file.write(page.content)
+    file.write(info)
 
 # Create PowerPoint Presentation
 ppt = Presentation()
