@@ -1,67 +1,46 @@
 from pptx import Presentation
-from bs4 import BeautifulSoup
-import requests
-import json
-import re
+import wikipedia
 
 
-# Get Inputs
-search_term = input("Search: ").title()
+def search():
+    search_term = input("Search: ")
+    # Fix Search Term in case of errors:
+    fixed_search_term = wikipedia.suggest(search_term)
+    # If Search Term needs fixing:
+    if fixed_search_term:
+        return wikipedia.search(fixed_search_term)
+    # If Search Term doesn't need fixing:
+    else:
+        return wikipedia.search(search_term)
 
-# Build URL
-url = "https://en.wikipedia.org/wiki/" + search_term
+def select_topic(search_term):
+    while True:
+        print("---------- DETECTED TOPICS ---------")
+        # Iterate over Search Result's Length and Contents at the same time:
+        for i, topic in zip(range(len(search_term)), search_term):
+            print(f"{i+1} - {topic}")
+        topic_number = input("\nInsert Topic Number: ")
+        try: 
+            if 1 <= int(topic_number) <= len(search_term):
+                return int(topic_number)
+            else:
+                print("Invalid Topic Number.\n")
+        except TypeError:
+            print("Invalid Topic Number.\n")
 
-# Make Request
-request = requests.get(url)
+search_result = search()
+topic_result = select_topic(search_result)
+page = wikipedia.page(search_result[topic_result-1])
 
-# Evaluate Status Code
-if request.status_code == 200:
-    
-    # Get Data
-    soup = BeautifulSoup(request.text, "html.parser")
+with open("text.txt", "w", encoding="utf-8") as file:
+    file.write(page.content)
 
-    # Remove All Tables
-    soup.table.decompose()
-    soup
-
-    # Get Headers and Paragraphs
-    paragraphs = soup.findAll(["h1", "h2", "h3", "h4", "h5", "h6", "p", ""])
-
-    """# Get JSON/Dict
-    data = {}
-    for paragraph in paragraphs:
-        data += json.loads(paragraph)"""
-    
-    # Extract Text Only
-    clean_paragraphs = [paragraph.get_text() for paragraph in paragraphs]
-
-    # Join Pieces of Text Together
-    raw_text = "\n".join(clean_paragraphs)
-
-    # Remove Everything from "See Also" onwards:
-    separate_texts = raw_text.split("See also")
-    text = separate_texts[0]
-    
-    # Using Regex to Remove "[x]"
-    regex = re.compile("\[.*\]")
-    clean_text = regex.sub("", text)
-
-    # Write Text to File:
-    with open("text.txt", "w", encoding = "utf-8") as file:
-        file.write(clean_text)
-
-    # Create PowerPoint Presentation
-    ppt = Presentation()
-    title_slide_layout = ppt.slide_layouts[0]
-    title_slide = ppt.slides.add_slide(title_slide_layout)
-    title = title_slide.shapes.title
-    title.text = search_term
-    ppt.save('presentation.pptx')
-        
-elif request.status_code == 404:
-    print("No data was found.")
-else:
-    print("An error occurred.")
-
-
-
+# Create PowerPoint Presentation
+ppt = Presentation()
+title_slide_layout = ppt.slide_layouts[0]
+title_slide = ppt.slides.add_slide(title_slide_layout)
+title = title_slide.shapes.title
+title.text = page.title
+subtitle = title_slide.placeholders[1]
+subtitle.text = page.summary
+ppt.save('presentation.pptx')
