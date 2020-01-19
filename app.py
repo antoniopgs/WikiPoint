@@ -1,6 +1,6 @@
 from pptx import Presentation
 import wikipedia
-
+import re
 
 def search():
     search_term = input("Search: ")
@@ -31,11 +31,17 @@ def select_topic(search_term):
 search_result = search()
 topic_result = select_topic(search_result)
 page = wikipedia.page(search_result[topic_result-1])
-pre_info = page.content.split("== See also ==")
+pre_info = page.content.split("\n== See also ==\n")
 info = pre_info[0].strip()
 
 with open("text.txt", "w", encoding="utf-8") as file:
     file.write(info)
+
+h2_tags = re.findall("\n== .* ==\n", info)
+h3_tags = re.findall("\n=== .* ===\n", info)
+h4_tags = re.findall("\n==== .* ====\n", info)
+h5_tags = re.findall("\n===== .* =====\n", info)
+h6_tags = re.findall("\n====== .* ======\n", info)
 
 # Create PowerPoint Presentation
 ppt = Presentation()
