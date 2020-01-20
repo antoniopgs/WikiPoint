@@ -37,17 +37,26 @@ info = pre_info[0].strip()
 with open("text.txt", "w", encoding="utf-8") as file:
     file.write(info)
 
-h2_tags = re.findall("\n== .* ==\n", info)
+h2_tags = [h2.strip("\n") for h2 in re.findall("\n== .* ==\n", info)]
 h3_tags = re.findall("\n=== .* ===\n", info)
 h4_tags = re.findall("\n==== .* ====\n", info)
 h5_tags = re.findall("\n===== .* =====\n", info)
 h6_tags = re.findall("\n====== .* ======\n", info)
 
-for h2 in h2_tags:
-    h2_section = [h2, info.split(h2)[1]]
+# Break Into H2 Sections:
+h2_sections = []
+for i in range(len(h2_tags)):
+    current_tag = h2_tags[i]
+    try:
+        next_tag = h2_tags[i+1]
+        pre_h2_section = info[info.index(current_tag):info.index(next_tag)]
+    except IndexError:
+        pre_h2_section = info[info.index(current_tag):]
+    h2_section = [current_tag, pre_h2_section.strip(current_tag)]
+    h2_sections.append(h2_section)
 
-for i in info:
-    print(i)
+for section in h2_sections:
+    print(section)
     print("----- BREAK -----")
 
 # Create PowerPoint Presentation
