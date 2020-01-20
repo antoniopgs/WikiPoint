@@ -43,6 +43,13 @@ h4_tags = re.findall("\n==== .* ====\n", info)
 h5_tags = re.findall("\n===== .* =====\n", info)
 h6_tags = re.findall("\n====== .* ======\n", info)
 
+for h2 in h2_tags:
+    h2_section = [h2, info.split(h2)[1]]
+
+for i in info:
+    print(i)
+    print("----- BREAK -----")
+
 # Create PowerPoint Presentation
 ppt = Presentation()
 title_slide_layout = ppt.slide_layouts[0]
