@@ -38,25 +38,24 @@ with open("text.txt", "w", encoding="utf-8") as file:
     file.write(info)
 
 h2_tags = [h2.strip("\n") for h2 in re.findall("\n== .* ==\n", info)]
-h3_tags = re.findall("\n=== .* ===\n", info)
-h4_tags = re.findall("\n==== .* ====\n", info)
-h5_tags = re.findall("\n===== .* =====\n", info)
-h6_tags = re.findall("\n====== .* ======\n", info)
+h3_tags = [h3.strip("\n") for h3 in re.findall("\n=== .* ===\n", info)]
+h4_tags = [h4.strip("\n") for h4 in re.findall("\n==== .* ===\n", info)]
+h5_tags = [h5.strip("\n") for h5 in re.findall("\n===== .* =====\n", info)]
+h6_tags = [h6.strip("\n") for h6 in re.findall("\n====== .* ======\n", info)]
 
 # Break Into H2 Sections:
-h2_sections = []
+h2_sections = {}
 for i in range(len(h2_tags)):
     current_tag = h2_tags[i]
     try:
         next_tag = h2_tags[i+1]
-        pre_h2_section = info[info.index(current_tag):info.index(next_tag)]
+        h2_section = info[info.index(current_tag):info.index(next_tag)].strip(current_tag)
     except IndexError:
-        pre_h2_section = info[info.index(current_tag):]
-    h2_section = [current_tag, pre_h2_section.strip(current_tag)]
-    h2_sections.append(h2_section)
+        h2_section = info[info.index(current_tag):].strip(current_tag)
+    h2_sections[current_tag] = h2_section 
 
-for section in h2_sections:
-    print(section)
+for key, value in h2_sections.items():
+    print(key, value)
     print("----- BREAK -----")
 
 # Create PowerPoint Presentation
