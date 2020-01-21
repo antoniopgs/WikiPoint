@@ -49,13 +49,24 @@ for i in range(len(h2_tags)):
     current_tag = h2_tags[i]
     try:
         next_tag = h2_tags[i+1]
-        h2_section = info[info.index(current_tag):info.index(next_tag)].strip(current_tag)
+        h2_section = info[info.index(current_tag):info.index(next_tag)].strip(current_tag).strip()
     except IndexError:
-        h2_section = info[info.index(current_tag):].strip(current_tag)
+        h2_section = info[info.index(current_tag):].strip(current_tag).strip()
     h2_sections[current_tag] = h2_section 
 
+h3_sections = {}
+for value in h2_sections.values():
+    for i in range(len(h3_tags)):
+        current_tag = h3_tags[i]
+        try:
+            next_tag = h3_tags[i+1]
+            h3_section = value[value.index(current_tag):value.index(next_tag)].strip(current_tag).strip()
+        except IndexError:
+            h3_section = value[value.index(current_tag):].strip(current_tag).strip()
+        h3_sections[current_tag] = h3_section
+
 for key, value in h2_sections.items():
-    print(key, value)
+    print(f"Key: {key}, Value: {value}")
     print("----- BREAK -----")
 
 # Create PowerPoint Presentation
