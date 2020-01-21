@@ -28,52 +28,48 @@ def select_topic(search_term):
         except TypeError:
             print("Invalid Topic Number.\n")
 
-def split_sections(data):
-    # Detect Tags:
-    h2_tags = [h2.strip("\n") for h2 in re.findall("\n== .* ==\n", data)]
-    h3_tags = [h3.strip("\n") for h3 in re.findall("\n=== .* ===\n", data)]
-    h4_tags = [h4.strip("\n") for h4 in re.findall("\n==== .* ===\n", data)]
-    h5_tags = [h5.strip("\n") for h5 in re.findall("\n===== .* =====\n", data)]
-    h6_tags = [h6.strip("\n") for h6 in re.findall("\n====== .* ======\n", data)]
-    # Create Tags Group:
-    tags_group = [h2_tags, h3_tags, h4_tags, h5_tags, h6_tags]
-    # Create Sections Group:
-    h2_sections, h3_sections, h4_sections, h5_sections, h6_sections = [], [], [], [], []
-    sections_group = [h2_sections, h3_sections, h4_sections, h5_sections, h6_sections]
-    # Generate:
-    for tags, sections in zip(tags_group, sections_group):
-        for i in range(len(tags)):
-            current_tag = tags[i]
-            try:
-                next_tag = tags[i+1]
-                section = data[data.index(current_tag):data.index(next_tag)].strip(current_tag).strip()
-            except IndexError:
-                section = data[data.index(current_tag):].strip(current_tag).strip()
-            sections.append([current_tag, section])
-    return sections_group
-    
-
+# Search and get info:
 search_result = search()
 topic_result = select_topic(search_result)
 page = wikipedia.page(search_result[topic_result-1])
 pre_info = page.content.split("\n== See also ==\n")
 info = pre_info[0].strip()
-organized_info = split_sections(info)
 
-for generated_list in organized_info:
-    for element in generated_list:
-        print(f"\n----- Printing {element[0]} -----\n")
-        print(element[1])
-
+# Write info to .txt file:
 with open("text.txt", "w", encoding="utf-8") as file:
     file.write(info)
 
-# Create PowerPoint Presentation
+# Find all tags and add page title as first tag:
+tags = [tag.replace("=", "").strip().title() for tag in re.findall("\n==.*==\n", info)]
+tags.insert(0, page.title)
+
+# Split by all tags. Get tag's texts:
+tags_text = [section.strip() for section in re.split("\n==.*==\n", info)]
+
+# Create List with all Tags and Text:
+sections = list(zip(tags, tags_text))
+for section in sections:
+    print(f"Tag: {section[0]}")
+    print()
+    print(section[1])
+    print("\n ---- BREAK -----\n")
+
+# PowerPoint Generator:
 ppt = Presentation()
-title_slide_layout = ppt.slide_layouts[0]
-title_slide = ppt.slides.add_slide(title_slide_layout)
-title = title_slide.shapes.title
-title.text = page.title
-subtitle = title_slide.placeholders[1]
-subtitle.text = page.summary
+just_title = ppt.slide_layouts[0]
+title_content = ppt.slide_layouts[1]
+section_header = ppt.slide_layouts[2]
+two_content = ppt.slide_layouts[3]
+comparison = ppt.slide_layouts[4]
+title_only = ppt.slide_layouts[5]
+blank = ppt.slide_layouts[6]
+content_caption = ppt.slide_layouts[7]
+picture_caption = ppt.slide_layouts[8]
+for i in range(len(sections)):
+    if i == 0:
+        slide = ppt.slides.add_slide(just_title)
+    else:
+        slide = ppt.slides.add_slide(section_header)
+    title = slide.shapes.title
+    title.text = sections[i][0]
 ppt.save('presentation.pptx')
