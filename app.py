@@ -1,4 +1,5 @@
 from pptx import Presentation
+from pptx.util import Pt
 import wikipedia
 import re
 
@@ -76,21 +77,25 @@ for i in range(len(sections)):
         index = index_slide.shapes.placeholders[1]
         tf = index.text_frame
         intro_p = tf.add_paragraph()
-        intro_p.level = 1
+        intro_p.level = 0
         intro_p.text = "Introduction"
+        intro_p.font.name = "Calibri"
+        intro_p.font.size = Pt(11)
         for section in sections[1:]:
             p = tf.add_paragraph()
             if re.match("={2} .* ={2}", section[0]):
-                p.level = 1
+                p.level = 0
             elif re.match("={3} .* ={3}", section[0]):
-                p.level = 2
+                p.level = 1
             elif re.match("={4} .* ={4}", section[0]):
-                p.level = 3
+                p.level = 2
             elif re.match("={5} .* ={5}", section[0]):
-                p.level = 4
+                p.level = 3
             elif re.match("={6} .* ={6}", section[0]):
-                p.level = 5
+                p.level = 4
             p.text = section[0].replace("=", "").strip()
+            p.font.name = "Calibri"
+            p.font.size = Pt(11)
     else:
         info_slide = ppt.slides.add_slide(section_header)
         title = info_slide.shapes.title
