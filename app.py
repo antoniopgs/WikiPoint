@@ -75,7 +75,9 @@ for i in range(len(sections)):
         # Index Generator:
         index = index_slide.shapes.placeholders[1]
         tf = index.text_frame
-        #tf.text = "Find the bullet slide layout"
+        intro_p = tf.add_paragraph()
+        intro_p.level = 1
+        intro_p.text = "Introduction"
         for section in sections[1:]:
             p = tf.add_paragraph()
             if re.match("={2} .* ={2}", section[0]):
