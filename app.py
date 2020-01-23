@@ -97,7 +97,16 @@ for i in range(len(sections)):
             p.font.name = "Calibri"
             p.font.size = Pt(11)
     else:
-        info_slide = ppt.slides.add_slide(section_header)
-        title = info_slide.shapes.title
-        title.text = sections[i][0]
+        if re.match("={2} .* ={2}", sections[i][0]):
+            h2_cover = ppt.slides.add_slide(section_header)
+            c_title = h2_cover.shapes.title
+            c_title.text = sections[i][0].replace("=", "").strip()
+            h2_info = ppt.slides.add_slide(title_content)
+            i_title = h2_info.shapes.title
+            i_title.text = c_title.text
+            shapes = h2_info.shapes
+            body_shape = shapes.placeholders[1]
+            tf = body_shape.text_frame
+            tf.text = sections[i][1]
+            # Add Textbox
 ppt.save('presentation.pptx')
